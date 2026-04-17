@@ -131,8 +131,10 @@ td {
 function loadData() {
   const params = new URLSearchParams(window.location.search);
 
-  document.getElementById("carton").innerText = params.get("carton") || "1";
-  document.getElementById("total_cartons").innerText = params.get("total_cartons") || "1";
+  // document.getElementById("carton").innerText = params.get("carton") || "1";
+  // document.getElementById("total_cartons").innerText = params.get("total_cartons") || "1";
+
+  document.getElementById("quantity").innerText = params.get("quantity") || "1";
 
   document.getElementById("customer").innerHTML = decodeURIComponent(params.get("customer") || "");
 
