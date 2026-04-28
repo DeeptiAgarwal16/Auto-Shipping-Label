@@ -180,15 +180,17 @@ set("shipping_address", data.shipping_address);
 set("shipper_contact", data.shipper_contact);
 // set("sub_total", data.sub_total);
 // set("tax", data.tax);
-set("invoice_value", data.invoice_value);
-set("collectable_value", data.collectable_value);
+// set("invoice_value", data.invoice_value);
+// set("collectable_value", data.collectable_value);
+set("invoice_value", Number(data.invoice_value).toLocaleString("en-IN"));
+set("collectable_value", Number(data.collectable_value).toLocaleString("en-IN"));
 set("boxes", data.boxes);
 set("weight", data.weight + " Kg");
 
 /* ---------------- BARCODE ---------------- */
-// document.getElementById("barcode").src =
-//   "https://barcode.tec-it.com/barcode.ashx?data=" +
-//   data.awb + "&code=Code128";
+document.getElementById("barcode").src =
+  "https://barcode.tec-it.com/barcode.ashx?data=" +
+  data.awb + "&code=Code128";
 
 /* ---------------- CONTENTS TABLE ---------------- */
 /* Expected format: "Item1: 2, Item2: 1, ..." */
