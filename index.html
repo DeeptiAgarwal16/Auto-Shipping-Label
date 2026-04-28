@@ -160,7 +160,7 @@
 const params = new URLSearchParams(window.location.search);
 const raw = params.get("data");
 const data = JSON.parse(decodeURIComponent(raw));
-
+console.log(data);
 function set(id, val) {
   document.getElementById(id).innerText = val || "N/A";
 }
