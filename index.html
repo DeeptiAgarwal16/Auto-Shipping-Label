@@ -5,80 +5,89 @@
 <title>Shipping Label</title>
 
 <style>
-  @page {
-    size: A5 portrait;
-    margin: 6mm;
-  }
+@page {
+  size: A5 portrait;
+  margin: 6mm;
+}
 
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    font-size: 12px;
-  }
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  font-size: 12px;
+}
 
-  .label {
-    border: 1px solid #000;
-    padding: 8px;
-  }
+.label {
+  border: 1px solid #000;
+  padding: 8px;
+}
 
-  .header {
-    text-align: center;
-    font-weight: bold;
-    font-size: 16px;
-    border-bottom: 1px solid #000;
-    padding-bottom: 4px;
-    margin-bottom: 6px;
-  }
+/* TOP */
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .section {
-    border-bottom: 1px solid #000;
-    padding: 6px 0;
-  }
+.awb {
+  font-weight: bold;
+  font-size: 13px;
+}
 
-  .row {
-    display: flex;
-    justify-content: space-between;
-    margin: 2px 0;
-  }
+.barcode img {
+  height: 50px;
+}
 
-  .left { width: 50%; }
-  .right { width: 50%; text-align: right; }
+/* INFO */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 10px;
+  margin-top: 8px;
+}
 
-  .block {
-    border: 1px solid #000;
-    padding: 6px;
-    margin-top: 4px;
-  }
+/* ADDRESS */
+.address-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
 
-  .title {
-    font-weight: bold;
-    margin-bottom: 4px;
-  }
+.block {
+  flex: 1;
+  border: 1px solid #000;
+  padding: 6px;
+}
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 11px;
-  }
+.title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
 
-  table, th, td {
-    border: 1px solid #000;
-  }
+.big {
+  font-weight: bold;
+}
 
-  th, td {
-    padding: 4px;
-    text-align: left;
-  }
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+}
 
-  .barcode {
-    text-align: center;
-    margin-top: 5px;
-  }
+table, th, td {
+  border: 1px solid #000;
+}
 
-  .big {
-    font-weight: bold;
-    font-size: 10px;
-  }
+th, td {
+  padding: 4px;
+}
+
+/* SUMMARY */
+.summary {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+}
 </style>
 </head>
 
@@ -86,145 +95,161 @@
 
 <div class="label">
 
-  <!-- <div class="header">SHIPPING LABEL</div> -->
-
-  <!-- AWB -->
-  <div class="section">
-    <div class="row">
-      <div class="left">AWB / Tracking Number</div>
-      <div class="right big" id="awb"></div>
+  <!-- TOP -->
+  <div class="top-row">
+    <div>
+      <div>AWB / Tracking Number</div>
+      <div id="awb" class="awb"></div>
     </div>
+
     <div class="barcode">
       <img id="barcode">
     </div>
   </div>
 
-  <!-- Shipment Info -->
-  <div class="section">
-    <div class="row"><div>Courier</div><div id="courier"></div></div>
-    <div class="row"><div>Payment Mode</div><div id="payment_mode"></div></div>
-    <div class="row"><div>Ship Date</div><div id="ship_date"></div></div>
-    <div class="row"><div>Order ID</div><div id="order_id"></div></div>
-    <div class="row"><div>Invoice No</div><div id="invoice_number"></div></div>
-  </div>
+  <!-- INFO -->
+  <div class="info-grid">
+  <div>Courier</div><div id="courier"></div>
+  <div>Payment Mode</div><div id="payment_mode"></div>
+  <div>Ship Date</div><div id="ship_date"></div>
+  <div>Order ID</div><div id="order_id"></div>
+  <div>Invoice No</div><div id="invoice_number"></div>
+  <div>Boxes</div><div id="boxes"></div>
+  <div>Weight</div><div id="weight"></div>
+</div>
 
-  <!-- Addresses -->
-  <div class="section">
-    <div class="block">
-      <div class="title">From</div>
-      <div id="shipping_address"></div>
-      <div>Contact: <span id="shipper_contact"></span></div>
-    </div>
-
+  <!-- ADDRESS -->
+  <div class="address-row">
     <div class="block">
       <div class="title">Ship To</div>
       <div class="big" id="customer_name"></div>
       <div id="full_address"></div>
       <div>Contact: <span id="contact"></span></div>
-      <div><b>Pincode: </b><span id="pincode"></span></div>
+      <div><b>Pincode:</b> <span id="pincode" style="font-weight:bold;"></span></div>
+    </div>
+
+    <div class="block">
+      <div class="title">From</div>
+      <div id="shipping_address"></div>
+      <div>Contact: <span id="shipper_contact"></span></div>
     </div>
   </div>
 
-  <!-- Contents Table -->
-  <div class="section">
-    <div class="title">Contents</div>
-    <table id="items_table">
-      <thead>
-        <tr>
-          <th>Item</th>
-          <th style="text-align:right;">Qty</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <!-- CONTENTS -->
+  <div class="title">Contents</div>
+  <table id="items_table">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th style="text-align:right;">Qty</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <!-- TOTAL -->
+  <div class="summary">
+    <div>Total Invoice Value</div>
+    <div id="invoice_value"></div>
   </div>
 
-  <!-- Pricing -->
-  <div class="section">
-    <!-- <div class="row"><div>Sub Total</div><div id="sub_total"></div></div>
-    <div class="row"><div>Tax (GST)</div><div id="tax"></div></div> -->
-    <div class="row"><div>Total Invoice Value</div><div id="invoice_value"></div></div>
-    <div class="row"><div><b>Collectable Value</b></div><div id="collectable_value"><b></b></div></div>
+  <div class="summary">
+  <div><b>Collectable Value</b></div>
+  <div id="collectable_value" style="font-weight:bold;"></div>
+</div>
+
+  <!-- PACKAGE -->
+  <!-- <div class="summary">
+    <div>Boxes</div>
+    <div id="boxes"></div>
   </div>
 
-  <!-- Package -->
-  <div class="section">
-    <div class="row"><div>Boxes</div><div id="boxes"></div></div>
-    <div class="row"><div>Weight</div><div id="weight"></div></div>
-  </div>
+  <div class="summary">
+    <div>Weight</div>
+    <div id="weight"></div>
+  </div> -->
 
 </div>
 
 <script>
-/* ---------------- GET DATA ---------------- */
-const params = new URLSearchParams(window.location.search);
-const raw = params.get("data");
-const data = JSON.parse(decodeURIComponent(raw));
-console.log(data);
-function set(id, val) {
-  document.getElementById(id).innerText = val || "N/A";
+try {
+
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get("data");
+
+  let data = {};
+  if (raw) {
+    data = JSON.parse(decodeURIComponent(raw));
+  }
+
+  function set(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = val || "N/A";
+  }
+
+  function formatINR(val) {
+    if (!val) return "0";
+    return Number(val).toLocaleString("en-IN");
+  }
+
+  // BASIC
+  set("awb", data.awb);
+  set("courier", data.courier);
+  set("payment_mode", data.payment_mode);
+  set("ship_date", data.ship_date);
+  set("order_id", data.order_id);
+  set("invoice_number", data.invoice_number);
+
+  set("customer_name", data.customer_name);
+  set("full_address", data.full_address);
+  set("contact", data.contact);
+  set("pincode", data.pincode);
+
+  set("shipping_address", data.shipping_address);
+  set("shipper_contact", data.shipper_contact);
+
+  set("invoice_value", formatINR(data.invoice_value));
+  set("collectable_value", formatINR(data.collectable_value));
+
+  set("boxes", data.boxes);
+  set("weight", data.weight ? data.weight + " Kg" : "N/A");
+
+  // BARCODE
+  if (data.awb) {
+    document.getElementById("barcode").src =
+      "https://barcode.tec-it.com/barcode.ashx?data=" +
+      data.awb + "&code=Code128";
+  }
+
+  // CONTENT TABLE
+  const items = (data.contents || "").split(",");
+  const tbody = document.querySelector("#items_table tbody");
+
+  items.forEach(i => {
+    if (!i.trim()) return;
+
+    const parts = i.split(":");
+    const name = parts[0]?.trim();
+    const qty = parts[1]?.trim();
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${name}</td>
+        <td style="text-align:right">${qty}</td>
+      </tr>
+    `;
+  });
+
+  // PRINT
+  window.onload = function () {
+    setTimeout(() => {
+      window.print();
+    }, 500);
+  };
+
+} catch (e) {
+  console.error("LABEL ERROR:", e);
 }
-
-/* ---------------- BASIC FIELDS ---------------- */
-set("awb", data.awb);
-set("courier", data.courier);
-set("payment_mode", data.payment_mode);
-set("ship_date", data.ship_date);
-set("order_id", data.order_id);
-set("invoice_number", data.invoice_number);
-set("customer_name", data.customer_name);
-set("full_address", data.full_address);
-set("contact", data.contact);
-set("pincode", data.pincode);
-set("shipping_address", data.shipping_address);
-set("shipper_contact", data.shipper_contact);
-// set("sub_total", data.sub_total);
-// set("tax", data.tax);
-// set("invoice_value", data.invoice_value);
-// set("collectable_value", data.collectable_value);
-set("invoice_value", Number(data.invoice_value).toLocaleString("en-IN"));
-set("collectable_value", Number(data.collectable_value).toLocaleString("en-IN"));
-set("boxes", data.boxes);
-set("weight", data.weight + " Kg");
-
-/* ---------------- BARCODE ---------------- */
-document.getElementById("barcode").src =
-  "https://barcode.tec-it.com/barcode.ashx?data=" +
-  data.awb + "&code=Code128";
-
-/* ---------------- CONTENTS TABLE ---------------- */
-/* Expected format: "Item1: 2, Item2: 1, ..." */
-const items = data.contents.split(",");
-const tbody = document.querySelector("#items_table tbody");
-
-items.forEach(i => {
-  if(i.trim() === "") return;
-
-  const parts = i.split(":");
-  const name = parts[0]?.trim();
-  const qty = parts[1]?.trim();
-
-  const tr = document.createElement("tr");
-
-  const td1 = document.createElement("td");
-  td1.innerText = name;
-
-  const td2 = document.createElement("td");
-  td2.innerText = qty;
-  td2.style.textAlign = "right";
-
-  tr.appendChild(td1);
-  tr.appendChild(td2);
-  tbody.appendChild(tr);
-});
-
-/* ---------------- AUTO PRINT ---------------- */
-window.onload = function () {
-  setTimeout(() => {
-    window.focus();
-    window.print();
-  }, 700);
-};
 </script>
 
 </body>
