@@ -1,155 +1,502 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Shipping Label</title>
-
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* PRINT SETTINGS */
-@page {
-  margin: 10mm;
-}
-
-@media print {
   body {
-    margin: 0;
-  }
-
-  .container {
-    width: 100%;
-    height: 50vh;
+    background: #c8c8c8;
     display: flex;
     justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  /* A5 Portrait */
+  .label {
+    width: 148mm;
+    min-height: 210mm;
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── META BAR ── */
+  .meta-bar {
+    border-bottom: 1.5px solid #000;
+    padding: 5px 10px;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
   }
+  .meta-bar .left { display: flex; gap: 18px; }
+  .meta-field { display: flex; flex-direction: column; }
+  .meta-field .lbl {
+    font-size: 6.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: #555;
+  }
+  .meta-field .val {
+    font-size: 9px; font-weight: 600;
+    font-family: 'IBM Plex Mono', monospace; color: #000;
+  }
 
-  table {
-    width: 95%;
-    height: 100%;
+  /* ── AWB BAND ── */
+  .awb-band {
+    border-bottom: 1.5px solid #000;
+    padding: 8px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #000;
+    color: #fff;
+  }
+  .awb-block .lbl {
+    font-size: 7px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #aaa; margin-bottom: 2px;
+  }
+  .awb-number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px; font-weight: 600; letter-spacing: 3px; color: #fff;
+  }
+  .payment-tag {
+    border: 2px solid #fff;
+    padding: 4px 14px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; color: #fff;
+  }
+  .payment-tag.cod { background: #fff; color: #000; }
+
+  /* ── ADDRESS SECTION ── */
+  .address-section {
+    display: grid;
+    grid-template-columns: 58% 42%;
+    border-bottom: 1.5px solid #000;
+  }
+  .addr-block { padding: 10px 10px; }
+  .addr-block.ship-to { border-right: 1.5px solid #000; }
+
+  .addr-heading {
+    font-size: 7px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 2px; color: #555;
+    border-bottom: 1px solid #ccc; padding-bottom: 3px; margin-bottom: 6px;
+  }
+  .addr-label-tag {
+    display: inline-block;
+    font-size: 6.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; border: 1px solid #000;
+    padding: 1px 5px; margin-bottom: 4px;
+  }
+  .addr-name {
+    font-size: 14px; font-weight: 700; text-transform: uppercase;
+    line-height: 1.2; margin-bottom: 4px;
+  }
+  .addr-name.small { font-size: 11px; }
+  .pincode {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px; font-weight: 600;
+    letter-spacing: 4px; margin: 5px 0 3px;
+  }
+  .addr-line { font-size: 9.5px; line-height: 1.6; color: #222; }
+  .addr-phone {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; font-weight: 600; margin-top: 4px;
+  }
+
+  /* ── SHIPMENT ROW ── */
+  .shipment-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    border-bottom: 1.5px solid #000;
+  }
+  .shipment-cell { padding: 6px 10px; border-right: 1px solid #ccc; }
+  .shipment-cell:last-child { border-right: none; }
+  .shipment-cell .lbl {
+    font-size: 6.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: #666; margin-bottom: 2px;
+  }
+  .shipment-cell .val {
+    font-size: 10px; font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── SECTION BAR ── */
+  .section-bar {
+    background: #000; color: #fff;
+    padding: 3px 10px; font-size: 7px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 2.5px;
+  }
+
+  /* ── CONTENTS TABLE ── */
+  .contents-table { width: 100%; border-collapse: collapse; }
+  .contents-table thead tr {
+    border-bottom: 1px solid #000; background: #f5f5f5;
+  }
+  .contents-table th {
+    padding: 4px 10px; font-size: 7px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: #444; text-align: left;
+  }
+  .contents-table th.right { text-align: right; }
+  .contents-table td {
+    padding: 4px 10px; font-size: 9px;
+    border-bottom: 1px solid #ebebeb; color: #111;
+  }
+  .contents-table td.right { text-align: right; font-weight: 600; }
+  .contents-table td.sno { color: #888; font-size: 8px; width: 22px; }
+  .contents-table tbody tr:last-child td { border-bottom: none; }
+
+  /* ── FINANCIALS ── */
+  .financials {
+    border-top: 1.5px solid #000;
+    display: grid; grid-template-columns: 1fr 1fr;
+  }
+  .fin-left { padding: 8px 10px; border-right: 1.5px solid #000; }
+  .fin-right { padding: 8px 10px; }
+
+  .fin-row {
+    display: flex; justify-content: space-between;
+    align-items: baseline; padding: 2.5px 0; font-size: 9px;
+  }
+  .fin-row .fl { color: #555; }
+  .fin-row .fv { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+  .fin-row.grandtotal {
+    border-top: 1.5px solid #000;
+    margin-top: 4px; padding-top: 6px; font-size: 11px; font-weight: 700;
+  }
+  .fin-row.grandtotal .fl { color: #000; font-weight: 700; }
+  .fin-row.grandtotal .fv { font-size: 13px; }
+
+  /* ── COLLECTABLE BOX ── */
+  .collectable-box {
+    border: 2px solid #000; padding: 7px 10px; margin-bottom: 8px;
+  }
+  .collectable-box .cl-label {
+    font-size: 7px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.5px; color: #555; margin-bottom: 2px;
+  }
+  .collectable-box .cl-amount {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px; font-weight: 700; line-height: 1;
+  }
+  .collectable-box .cl-note {
+    font-size: 7px; color: #777; margin-top: 2px;
+  }
+
+  /* ── BARCODE ── */
+  .barcode-area {
+    border-top: 1.5px solid #000;
+    padding: 8px 10px 5px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
+  }
+  .barcode-lines { display: flex; gap: 1.5px; height: 30px; align-items: flex-end; }
+  .bar { background: #000; }
+  .barcode-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 3px; font-weight: 500;
+  }
+
+  /* ── FOOTER ── */
+  .label-footer {
+    border-top: 1.5px solid #000;
+    padding: 4px 10px;
+    display: flex; justify-content: space-between;
+    font-size: 7px; color: #666;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-top: auto;
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    body { background: none; padding: 0; margin: 0; }
+    .label { box-shadow: none; width: 148mm; min-height: 210mm; }
+    @page { size: A5 portrait; margin: 5mm; }
+  }
+</style>
+</head>
+<body>
+<div class="label">
+
+  <!-- META BAR -->
+  <div class="meta-bar">
+    <div class="left">
+      <div class="meta-field">
+        <span class="lbl">Order ID</span>
+        <span class="val" id="m-orderid">—</span>
+      </div>
+      <div class="meta-field">
+        <span class="lbl">Invoice No.</span>
+        <span class="val" id="m-invoice">—</span>
+      </div>
+      <div class="meta-field">
+        <span class="lbl">Ship Date</span>
+        <span class="val" id="m-date">—</span>
+      </div>
+    </div>
+    <div class="meta-field" style="text-align:right">
+      <span class="lbl">Invoice Value</span>
+      <span class="val" id="m-invval">—</span>
+    </div>
+  </div>
+
+  <!-- AWB BAND -->
+  <div class="awb-band">
+    <div class="awb-block">
+      <div class="lbl">Tracking / AWB Number</div>
+      <div class="awb-number" id="awb-number">—</div>
+    </div>
+    <div class="payment-tag" id="payment-tag">PREPAID</div>
+  </div>
+
+  <!-- ADDRESS SECTION -->
+  <div class="address-section">
+
+    <!-- SHIP TO -->
+    <div class="addr-block ship-to">
+      <div class="addr-heading">Ship To</div>
+      <div class="addr-label-tag">Consignee</div>
+      <div class="addr-name" id="to-name">—</div>
+      <div class="pincode mono" id="to-pincode">—</div>
+      <div class="addr-line" id="to-address">—</div>
+      <div class="addr-phone" id="to-phone">—</div>
+    </div>
+
+    <!-- RETURN ADDRESS -->
+    <div class="addr-block">
+      <div class="addr-heading">Return / Ship From</div>
+      <div class="addr-label-tag">Shipper</div>
+      <div class="addr-name small" id="from-name">SELLER</div>
+      <div class="addr-line" id="from-address">—</div>
+      <div class="addr-phone" id="from-phone">—</div>
+    </div>
+
+  </div>
+
+  <!-- SHIPMENT DETAILS ROW -->
+  <div class="shipment-row">
+    <div class="shipment-cell">
+      <div class="lbl">Courier Partner</div>
+      <div class="val" id="courier-name">—</div>
+    </div>
+    <div class="shipment-cell">
+      <div class="lbl">No. of Boxes</div>
+      <div class="val" id="boxes-val">—</div>
+    </div>
+    <div class="shipment-cell">
+      <div class="lbl">Weight</div>
+      <div class="val" id="weight-val">—</div>
+    </div>
+    <div class="shipment-cell">
+      <div class="lbl">Payment Mode</div>
+      <div class="val" id="pay-mode">—</div>
+    </div>
+  </div>
+
+  <!-- CONTENTS -->
+  <div class="section-bar">Shipment Contents</div>
+  <table class="contents-table">
+    <thead>
+      <tr>
+        <th style="width:22px">#</th>
+        <th>Item Description</th>
+        <th class="right" style="width:48px">Qty</th>
+      </tr>
+    </thead>
+    <tbody id="contents-tbody">
+      <tr><td colspan="3" style="padding:10px;text-align:center;color:#888;font-size:9px;">—</td></tr>
+    </tbody>
+  </table>
+
+  <!-- FINANCIALS -->
+  <div class="financials">
+    <div class="fin-left">
+      <div class="fin-row">
+        <span class="fl">Sub Total</span>
+        <span class="fv" id="f-subtotal">—</span>
+      </div>
+      <div class="fin-row">
+        <span class="fl">GST / Tax</span>
+        <span class="fv" id="f-tax">—</span>
+      </div>
+      <div class="fin-row grandtotal">
+        <span class="fl">Grand Total</span>
+        <span class="fv" id="f-total">—</span>
+      </div>
+    </div>
+    <div class="fin-right">
+      <div class="collectable-box" id="collectable-box">
+        <div class="cl-label" id="cl-label">Collectable Amount (COD)</div>
+        <div class="cl-amount" id="cl-amount">—</div>
+        <div class="cl-note" id="cl-note">Collect at time of delivery</div>
+      </div>
+      <div class="fin-row">
+        <span class="fl">Declared Value</span>
+        <span class="fv" id="f-declared">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARCODE -->
+  <div class="barcode-area">
+    <div class="barcode-lines" id="barcode-lines"></div>
+    <div class="barcode-text" id="barcode-text">—</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="label-footer">
+    <span>System generated label — not valid without AWB</span>
+    <span id="footer-date">—</span>
+  </div>
+
+</div>
+<script>
+function getParams() {
+  const raw = new URLSearchParams(window.location.search).get('data');
+  if (!raw) return null;
+  try {
+    const decoded = decodeURIComponent(raw);
+    const map = {};
+    const inner = decoded.replace(/^\{/, '').replace(/\}$/, '');
+    inner.split(/,\s*(?=[a-zA-Z_]+=)/).forEach(pair => {
+      const eq = pair.indexOf('=');
+      if (eq === -1) return;
+      map[pair.substring(0, eq).trim()] = pair.substring(eq + 1).trim();
+    });
+    return map;
+  } catch(e) { return null; }
+}
+
+function fmt(val) {
+  const n = parseFloat(val);
+  if (!val || isNaN(n)) return '—';
+  return '\u20B9' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function parseContents(raw) {
+  if (!raw) return [];
+  return raw.split(',').map(p => {
+    p = p.trim();
+    const ci = p.lastIndexOf(':');
+    if (ci === -1) return { name: p, qty: '1' };
+    return { name: p.substring(0, ci).trim(), qty: p.substring(ci + 1).trim() };
+  }).filter(i => i.name);
+}
+
+function generateBarcode(awb) {
+  const el = document.getElementById('barcode-lines');
+  el.innerHTML = '';
+  const seed = awb || '0000000000';
+  for (let i = 0; i < 62; i++) {
+    const c = seed.charCodeAt(i % seed.length);
+    const t = (c * 13 + i * 7) % 4;
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.style.height = ['30px','22px','16px','10px'][t];
+    bar.style.width  = t === 0 ? '2.5px' : t === 1 ? '1.5px' : '1px';
+    el.appendChild(bar);
   }
 }
 
-/* NORMAL VIEW */
-body {
-  font-family: Arial;
-  margin: 0;
-  padding: 10px;
+function populate(d) {
+  const s = k => (d && d[k]) ? String(d[k]).trim() : '';
+
+  const awb = s('awb');
+  const pm  = (s('payment_mode') || 'PREPAID').toUpperCase();
+  const isCOD = pm.includes('COD');
+
+  document.getElementById('awb-number').textContent = awb || '—';
+  const tag = document.getElementById('payment-tag');
+  tag.textContent = pm;
+  if (isCOD) tag.classList.add('cod');
+
+  document.getElementById('m-orderid').textContent  = s('order_id')       || '—';
+  document.getElementById('m-invoice').textContent  = s('invoice_number') || '—';
+  document.getElementById('m-date').textContent     = s('ship_date')      || '—';
+  document.getElementById('m-invval').textContent   = fmt(s('invoice_value'));
+
+  document.getElementById('to-name').textContent    = (s('customer_name') || '—').toUpperCase();
+  document.getElementById('to-pincode').textContent = s('pincode') || '—';
+  const addrStr = [s('address'), s('city'), s('state')].filter(Boolean).join(', ') || s('full_address') || '—';
+  document.getElementById('to-address').textContent = addrStr;
+  document.getElementById('to-phone').textContent   = s('contact') || '—';
+
+  document.getElementById('from-address').textContent = s('shipping_address') || '—';
+  document.getElementById('from-phone').textContent   = s('shipper_contact') || s('shp_phone') || '—';
+
+  document.getElementById('courier-name').textContent = s('courier') || '—';
+  document.getElementById('boxes-val').textContent    = s('boxes')   || '—';
+  document.getElementById('weight-val').textContent   = s('weight') ? s('weight') + ' kg' : '—';
+  document.getElementById('pay-mode').textContent     = pm;
+
+  const items = parseContents(s('contents'));
+  document.getElementById('contents-tbody').innerHTML = items.length
+    ? items.map((item, i) => `<tr>
+        <td class="sno">${i + 1}</td>
+        <td>${item.name}</td>
+        <td class="right">${item.qty}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="3" style="padding:10px;text-align:center;color:#888;font-size:9px;">No items listed</td></tr>';
+
+  document.getElementById('f-subtotal').textContent = fmt(s('sub_total'));
+  document.getElementById('f-tax').textContent      = fmt(s('tax'));
+  document.getElementById('f-total').textContent    = fmt(s('invoice_value'));
+  document.getElementById('f-declared').textContent = fmt(s('invoice_value'));
+
+  if (isCOD) {
+    document.getElementById('cl-label').textContent  = 'Collectable Amount (COD)';
+    document.getElementById('cl-amount').textContent = fmt(s('collectable_value') || s('invoice_value'));
+    document.getElementById('cl-note').textContent   = 'Collect this amount at the time of delivery';
+  } else {
+    document.getElementById('cl-label').textContent  = 'Collectable Amount';
+    document.getElementById('cl-amount').textContent = '\u20B9 0.00';
+    document.getElementById('cl-note').textContent   = 'NIL — Payment already received (Prepaid)';
+  }
+
+  generateBarcode(awb);
+  document.getElementById('barcode-text').textContent = awb || '—';
+  document.getElementById('footer-date').textContent =
+    'Printed: ' + (s('ship_date') || new Date().toLocaleDateString('en-IN'));
 }
 
-.container {
-  width: 100%;
-  height: 50vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+const DEMO = {
+  awb: 'BD4927610384',
+  payment_mode: 'COD',
+  sub_total: '849.00',
+  tax: '152.82',
+  invoice_value: '1001.82',
+  collectable_value: '1001.82',
+  boxes: '1',
+  weight: '0.75',
+  contents: 'Wireless Earbuds Pro: 1, USB-C Cable 2m: 2, Mobile Stand Adjustable: 1',
+  invoice_number: 'INV-2024-00341',
+  order_id: 'ORD-7782341',
+  ship_date: '28-Apr-2026',
+  courier: 'BlueDart Express',
+  customer_name: 'Rahul Sharma',
+  address: '12, Sector 18, Noida',
+  city: 'Noida',
+  state: 'Uttar Pradesh',
+  pincode: '201301',
+  contact: '+91 98765 43210',
+  shipping_address: '45, Industrial Estate, Phase-2, New Delhi - 110020',
+  shipper_contact: '+91 11 4567 8901'
+};
 
-table {
-  width: 95%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-/* EQUAL COLUMN WIDTH */
-colgroup col {
-  width: 25%;
-}
-
-td {
-  border: 1px solid black;
-  padding: 8px;
-  font-size: 20px;
-  vertical-align: middle;
-  word-wrap: break-word;
-}
-
-.bold {
-  font-weight: bold;
-  font-size: 20px;
-}
-
-</style>
-</head>
-
-<body onload="loadData()">
-
-<div class="container">
-
-<table>
-
-<colgroup>
-  <col>
-  <col>
-  <col>
-  <col>
-</colgroup>
-
-<!-- ROW 1 -->
-<!-- <tr>
-<td class="bold">CARTON NUMBER</td>
-<td id="carton"></td>
-<td class="bold">TOTAL CARTONS</td>
-<td id="total_cartons"></td>
-</tr> -->
-<tr>
-<td class="bold">Total Quantity</td>
-<td colspan="3" id="quantity"></td>
-</tr>
-
-<!-- ROW 2 -->
-<tr>
-<td class="bold">CUSTOMER & DELIVERY DETAILS</td>
-<td colspan="3" id="customer"></td>
-</tr>
-
-<!-- ROW 3 -->
-<tr>
-<td class="bold">DELIVERY CITY</td>
-<td id="city"></td>
-<td class="bold">CONTACT DETAILS</td>
-<td id="phone"></td>
-</tr>
-
-<!-- ROW 4 -->
-<tr>
-<td class="bold">SHIPPER ADDRESS</td>
-<td colspan="3" id="shipper"></td>
-</tr>
-
-<!-- ROW 5 -->
-<tr>
-<td class="bold">SHIPPER CONTACT</td>
-<td colspan="3" id="shipper_contact"></td>
-</tr>
-
-</table>
-
-</div>
-
-<script>
-function loadData() {
-  const params = new URLSearchParams(window.location.search);
-
-  // document.getElementById("carton").innerText = params.get("carton") || "1";
-  // document.getElementById("total_cartons").innerText = params.get("total_cartons") || "1";
-
-  document.getElementById("quantity").innerText = params.get("quantity") || "1";
-
-  document.getElementById("customer").innerHTML = decodeURIComponent(params.get("customer") || "");
-
-  document.getElementById("city").innerText = params.get("city") || "";
-  document.getElementById("phone").innerText = params.get("phone") || "";
-
-  document.getElementById("shipper").innerHTML = decodeURIComponent(params.get("shipper") || "");
-  document.getElementById("shipper_contact").innerText = params.get("shipper_contact") || "";
-
-  // Auto print
-  setTimeout(() => {
-    window.print();
-  }, 500);
-}
+const params = getParams();
+populate(params || DEMO);
+window.addEventListener('load', () => {
+  if (params) setTimeout(() => window.print(), 600);
+});
 </script>
-
 </body>
 </html>
