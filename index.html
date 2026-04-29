@@ -19,6 +19,7 @@ body {
 .label {
   border: 1px solid #000;
   padding: 8px;
+  page-break-after: always;
 }
 
 /* TOP */
@@ -93,85 +94,7 @@ th, td {
 
 <body>
 
-<div class="label">
-
-  <!-- TOP -->
-  <div class="top-row">
-    <div>
-      <div>AWB / Tracking Number</div>
-      <div id="awb" class="awb"></div>
-    </div>
-
-    <div class="barcode">
-      <img id="barcode">
-    </div>
-  </div>
-
-  <!-- INFO -->
-  <div class="info-grid">
-  <div>Courier</div><div id="courier"></div>
-  <div>Payment Mode</div><div id="payment_mode"></div>
-  <div>Ship Date</div><div id="ship_date"></div>
-  <div>Order ID</div><div id="order_id"></div>
-  <div>Invoice No</div><div id="invoice_number"></div>
-  <div>Boxes</div><div id="boxes"></div>
-  <div>Weight</div><div id="weight"></div>
-</div>
-
-  <!-- ADDRESS -->
-  <div class="address-row">
-    <div class="block">
-      <div class="title">Ship To</div>
-      <div class="big" id="customer_name"></div>
-      <div id="full_address"></div>
-      <div>Contact: <span id="contact"></span></div>
-      <div><b>Pincode:</b> <span id="pincode" style="font-weight:bold;"></span></div>
-    </div>
-
-    <div class="block">
-      <div class="title">From</div>
-      <div>GNV Commodities Pvt. Ltd.</div>
-      <div id="shipping_address"></div>
-      <div>Contact: <span id="shipper_contact"></span></div>
-    </div>
-  </div>
-
-  <!-- CONTENTS -->
-   <br>
-  <div class="title">Contents</div>
-  <table id="items_table">
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th style="text-align:right;">Qty</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <!-- TOTAL -->
-  <div class="summary">
-    <div>Total Invoice Value</div>
-    <div id="invoice_value"></div>
-  </div>
-
-  <div class="summary">
-  <div><b>Collectable Value</b></div>
-  <div id="collectable_value" style="font-weight:bold;"></div>
-</div>
-
-  <!-- PACKAGE -->
-  <!-- <div class="summary">
-    <div>Boxes</div>
-    <div id="boxes"></div>
-  </div>
-
-  <div class="summary">
-    <div>Weight</div>
-    <div id="weight"></div>
-  </div> -->
-
-</div>
+<div id="labels_container"></div>
 
 <script>
 try {
@@ -184,69 +107,117 @@ try {
     data = JSON.parse(decodeURIComponent(raw));
   }
 
-  function set(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.innerText = val || "N/A";
-  }
+  const container = document.getElementById("labels_container");
 
   function formatINR(val) {
     if (!val) return "0";
     return Number(val).toLocaleString("en-IN");
   }
 
-  // BASIC
-  set("awb", data.awb);
-  set("courier", data.courier);
-  set("payment_mode", data.payment_mode);
-  set("ship_date", data.ship_date);
-  set("order_id", data.order_id);
-  set("invoice_number", data.invoice_number);
-
-  set("customer_name", data.customer_name);
-  set("full_address", data.full_address);
-  set("contact", data.contact);
-  set("pincode", data.pincode);
-
-  set("shipping_address", data.shipping_address);
-  set("shipper_contact", data.shipper_contact);
-
-  set("invoice_value", formatINR(data.invoice_value));
-  set("collectable_value", formatINR(data.collectable_value));
-
-  set("boxes", data.boxes);
-  set("weight", data.weight ? data.weight + " Kg" : "N/A");
-
-  // BARCODE
-  if (data.awb) {
-    document.getElementById("barcode").src =
-      "https://barcode.tec-it.com/barcode.ashx?data=" +
-      data.awb + "&code=Code128";
+  function isCOD(mode) {
+    if (!mode) return false;
+    mode = mode.toLowerCase();
+    return mode.includes("cash on delivery") || mode.includes("cheque on delivery");
   }
 
-  // CONTENT TABLE
-  const items = (data.contents || "").split(",");
-  const tbody = document.querySelector("#items_table tbody");
+  function generateLabel(boxIndex, totalBoxes) {
 
-  items.forEach(i => {
-    if (!i.trim()) return;
+    const div = document.createElement("div");
+    div.className = "label";
 
-    const parts = i.split(":");
-    const name = parts[0]?.trim();
-    const qty = parts[1]?.trim();
+    div.innerHTML = `
+      <div class="top-row">
+        <div>
+          <div>AWB / Tracking Number</div>
+          <div class="awb">${data.awb || ""}</div>
+          <div style="font-weight:bold;">Box ${boxIndex}/${totalBoxes}</div>
+        </div>
 
-    tbody.innerHTML += `
-      <tr>
-        <td>${name}</td>
-        <td style="text-align:right">${qty}</td>
-      </tr>
+        <div class="barcode">
+          <img src="https://barcode.tec-it.com/barcode.ashx?data=${data.awb}&code=Code128">
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div>Courier</div><div>${data.courier || ""}</div>
+        <div>Payment Mode</div><div>${data.payment_mode || ""}</div>
+        <div>Ship Date</div><div>${data.ship_date || ""}</div>
+        <div>Order ID</div><div>${data.order_id || ""}</div>
+        <div>Invoice No</div><div>${data.invoice_number || ""}</div>
+        <div>Boxes</div><div>${totalBoxes}</div>
+        <div>Weight</div><div>${data.weight ? data.weight + " Kg" : ""}</div>
+      </div>
+
+      <!-- ADDRESS (FROM LEFT, SHIP TO RIGHT) -->
+      <div class="address-row">
+        <div class="block">
+          <div class="title">From</div>
+          <div>GNV Commodities Pvt. Ltd.</div>
+          <div>${data.shipping_address || ""}</div>
+          <div>Contact: ${data.shipper_contact || ""}</div>
+        </div>
+
+        <div class="block">
+          <div class="title">Ship To</div>
+          <div class="big">${data.customer_name || ""}</div>
+          <div>${data.full_address || ""}</div>
+          <div>Contact: ${data.contact || ""}</div>
+          <div><b>Pincode:</b> <span style="font-weight:bold;">${data.pincode || ""}</span></div>
+        </div>
+      </div>
+
+      <div class="title">Contents</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style="text-align:right;">Qty</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${(data.contents || "").split(",").map(i => {
+            if (!i.trim()) return "";
+            const parts = i.split(":");
+            return `
+              <tr>
+                <td>${parts[0]?.trim()}</td>
+                <td style="text-align:right">${parts[1]?.trim()}</td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+
+      <div class="summary">
+        <div>Total Invoice Value</div>
+        <div>${formatINR(data.invoice_value)}</div>
+      </div>
+
+      ${
+        isCOD(data.payment_mode) ? `
+        <div class="summary">
+          <div><b>Collectable Value</b></div>
+          <div style="font-weight:bold;">${formatINR(data.collectable_value)}</div>
+        </div>
+        ` : ""
+      }
+
     `;
-  });
 
-  // PRINT
+    return div;
+  }
+
+  const totalBoxes = Number(data.boxes) || 1;
+
+  for (let i = 1; i <= totalBoxes; i++) {
+    container.appendChild(generateLabel(i, totalBoxes));
+  }
+
+  // AUTO PRINT
   window.onload = function () {
     setTimeout(() => {
       window.print();
-    }, 500);
+    }, 600);
   };
 
 } catch (e) {
