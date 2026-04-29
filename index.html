@@ -178,6 +178,7 @@ try {
           <div><b>Pincode:</b> <span style="font-weight:bold;">${data.pincode || ""}</span></div>
         </div>
       </div>
+      <br>
 
       <div class="title">Contents</div>
       <table>
@@ -195,11 +196,14 @@ try {
         </tbody>
       </table>
 
-      <div class="summary">
-        <div>Total Invoice Value</div>
-        <div>${formatINR(data.invoice_value)}</div>
-      </div>
-
+      ${
+        isCOD(data.payment_mode) ? `
+        <div class="summary">
+          <div>Total Invoice Value</div>
+          <div>${formatINR(data.invoice_value)}</div>
+        </div>
+        ` : ""
+      }
       ${
         isCOD(data.payment_mode) ? `
         <div class="summary">
