@@ -164,16 +164,16 @@ try {
       <!-- ADDRESS (FROM LEFT, SHIP TO RIGHT) -->
       <div class="address-row">
         <div class="block">
-          <div class="title">From</div>
+          <div class="title">From</div> <br>
           <div>GNV Commodities Pvt. Ltd.</div>
-          <div>${data.shipping_address || ""}</div>
+          <div>${data.shipping_address || ""}</div> <br>
           <div>Contact: ${data.shipper_contact || ""}</div>
         </div>
 
         <div class="block">
-          <div class="title">Ship To</div>
+          <div class="title">Ship To</div> <br>
           <div class="big">${data.customer_name || ""}</div>
-          <div>${data.full_address || ""}</div>
+          <div>${data.full_address || ""}</div> <br>
           <div>Contact: ${data.contact || ""}</div>
           <div><b>Pincode:</b> <span style="font-weight:bold;">${data.pincode || ""}</span></div>
         </div>
