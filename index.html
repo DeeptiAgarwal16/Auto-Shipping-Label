@@ -129,7 +129,6 @@ try {
     return mode.includes("cash on delivery") || mode.includes("cheque on delivery");
   }
 
-  totalBoxes=3;
   function generateLabel(boxIndex, totalBoxes) {
 
     const div = document.createElement("div");
@@ -221,7 +220,7 @@ try {
 
   const totalBoxes = Number(data.boxes) || 1;
 
-  for (let i = 1; i <= totalBoxes; i++) {
+  for (let i = 1; i <= 3; i++) {
     container.appendChild(generateLabel(i, totalBoxes));
   }
 
