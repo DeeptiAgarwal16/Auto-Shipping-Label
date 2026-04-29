@@ -21,6 +21,9 @@ body {
   padding: 8px;
   page-break-after: always;
 }
+.label:last-child {
+  break-after: auto;
+}
 
 /* TOP */
 .top-row {
@@ -220,7 +223,7 @@ try {
 
   const totalBoxes = Number(data.boxes) || 1;
 
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= totalBoxes; i++) {
     container.appendChild(generateLabel(i, totalBoxes));
   }
 
