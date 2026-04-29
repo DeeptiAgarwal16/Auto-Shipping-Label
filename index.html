@@ -175,16 +175,10 @@ try {
           </tr>
         </thead>
         <tbody>
-          ${(data.contents || "").split(",").map(i => {
-            if (!i.trim()) return "";
-            const parts = i.split(":");
-            return `
-              <tr>
-                <td>${parts[0]?.trim()}</td>
-                <td style="text-align:right">${parts[1]?.trim()}</td>
-              </tr>
-            `;
-          }).join("")}
+          <tr>
+            <td>Pet Food / Accessories</td>
+            <td style="text-align:right">${data.quantity || "0"}</td>
+          </tr>
         </tbody>
       </table>
 
