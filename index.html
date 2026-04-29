@@ -89,6 +89,15 @@ th, td {
   justify-content: space-between;
   margin-top: 6px;
 }
+
+.barcode-center {
+  text-align: center;
+  margin-top: 6px;
+}
+
+.barcode-center img {
+  height: 50px;
+}
 </style>
 </head>
 
@@ -127,16 +136,20 @@ try {
 
     div.innerHTML = `
       <div class="top-row">
-        <div>
-          <div>AWB / Tracking Number</div>
-          <div class="awb">${data.awb || ""}</div>
-          <div style="font-weight:bold;">Box ${boxIndex}/${totalBoxes}</div>
-        </div>
-
-        <div class="barcode">
-          <img src="https://barcode.tec-it.com/barcode.ashx?data=${data.awb}&code=Code128">
-        </div>
+      <div>
+        <div>AWB / Tracking Number</div>
+        <div class="awb">${data.awb || ""}</div>
       </div>
+
+      <div style="font-weight:bold; text-align:right;">
+        Box ${boxIndex}/${totalBoxes}
+      </div>
+    </div>
+
+    <!-- BARCODE CENTERED -->
+    <div class="barcode-center">
+      <img src="https://barcode.tec-it.com/barcode.ashx?data=${data.awb}&code=Code128">
+    </div>
 
       <div class="info-grid">
         <div>Courier</div><div>${data.courier || ""}</div>
